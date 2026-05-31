@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RepoTrim — High-Performance Repository Optimization</title>
+  <meta name="description" content="Concurrently crawl directories, parse AST structures, and eliminate unused assets, configurations, and duplicate files with the Go RepoTrim Core Engine.">
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo-group">
+        <i class="fa-solid fa-scissors"></i> RepoTrim<span>Core Engine</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#demo">Interactive Demo</a></li>
+        <li><a href="#calculator">Savings Estimator</a></li>
+        <li><a href="#install">Installation</a></li>
+      </ul>
+      <a href="#install" class="cta-button">Install Binary</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="badge">
+      <i class="fa-solid fa-bolt"></i> Powered by Go Concurrency
+    </div>
+    <h1>Repository Bloat, Eliminated.</h1>
+    <p>Concurrently crawls files, parses abstract syntax trees, and dynamically maps usage references to secure static savings. Build lightweight Docker layers, reduce CI/CD runner overhead, and maintain absolute structural clarity.</p>
+    <div class="hero-actions">
+      <button class="cta-button" onclick="document.getElementById('demo').scrollIntoView({behavior: 'smooth'})">Run Demo Analysis</button>
+      <button class="secondary-button" onclick="document.getElementById('calculator').scrollIntoView({behavior: 'smooth'})">Estimate Size Savings</button>
+    </div>
+  </section>
+
+  <!-- Interactive Terminal Showcase Console -->
+  <section class="showcase-console" id="demo">
+    <h2 class="section-title">Experience the Execution Pipeline</h2>
+    <div class="panel">
+      <!-- Tabs Header -->
+      <div class="console-tabs">
+        <button class="console-tab-btn active" onclick="switchConsoleTab('terminal')">
+          <i class="fa-solid fa-terminal"></i> Terminal Output
+        </button>
+        <button class="console-tab-btn" onclick="switchConsoleTab('json')">
+          <i class="fa-solid fa-code"></i> JSON Payload
+        </button>
+        <button class="console-tab-btn" onclick="switchConsoleTab('impact')">
+          <i class="fa-solid fa-chart-simple"></i> Optimization Impact
+        </button>
+      </div>
+      <!-- Console Content -->
+      <div class="console-header">
+        <div class="console-dots">
+          <span class="dot-red"></span>
+          <span class="dot-yellow"></span>
+          <span class="dot-green"></span>
+        </div>
+        <div class="console-title">repotrim@runner-ubuntu:~</div>
+      </div>
+      
+      <!-- Terminal Console Body -->
+      <div class="console-body" id="consoleContent">
+        <!-- Interactive Trigger Button overlay -->
+        <button class="console-cta-trigger" id="runSimBtn" onclick="runAnalysisSimulation()">
+          <i class="fa-solid fa-play"></i> Run Simulation Analysis
+        </button>
+        <div id="typewriterText"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section class="features-section" id="features">
+    <h2 class="section-title">Built for Modern Pipeline Speeds</h2>
+    <div class="grid-features">
+      
+      <!-- Feature 1 -->
+      <div class="panel feature-card">
+        <div class="icon-wrapper">
+          <i class="fa-solid fa-network-wired"></i>
+        </div>
+        <h3>Goroutine Crawler</h3>
+        <p>Uses configurable Go worker pipelines and highly optimized file walking routines to scan large workspaces concurrently, completing in milliseconds.</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="panel feature-card">
+        <div class="icon-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <h3>AST Token Parser</h3>
+        <p>Uses standard library <code>text/scanner</code> to tokenize string literals with zero heavy runtime overhead, dynamically mapping unquoted configuration paths.</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="panel feature-card">
+        <div class="icon-wrapper">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3>Heuristic Rules Engine</h3>
+        <p>Correctly groups exact SHA256 checksums to flag duplicate assets and traces files to verify if they are active, with offline bypass keys for test suites.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Storage Savings Calculator -->
+  <section class="calculator-section" id="calculator">
+    <h2 class="section-title">Calculate Your Storage Recovery</h2>
+    <div class="panel calc-box">
+      <!-- Input Sliders -->
+      <div class="calc-sliders">
+        
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Duplicate Assets (Images/Media)</span>
+            <span class="value" id="dupCountVal">12</span>
+          </div>
+          <input type="range" id="dupCount" min="0" max="50" value="12" oninput="calculateSavings()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Average Duplicate File Size (MB)</span>
+            <span class="value" id="dupSizeVal">2.4 MB</span>
+          </div>
+          <input type="range" id="dupSize" min="0.5" max="10.0" step="0.5" value="2.5" oninput="calculateSavings()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Unused Configurations & Scripts</span>
+            <span class="value" id="scriptCountVal">4</span>
+          </div>
+          <input type="range" id="scriptCount" min="0" max="15" value="4" oninput="calculateSavings()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Average Script/Config Size (KB)</span>
+            <span class="value" id="scriptSizeVal">250 KB</span>
+          </div>
+          <input type="range" id="scriptSize" min="50" max="500" step="50" value="250" oninput="calculateSavings()">
+        </div>
+
+      </div>
+
+      <!-- Live Calculations Result -->
+      <div class="calc-result">
+        <h4>Recoverable Storage Space</h4>
+        <div class="savings-number" id="totalSavingsResult">31.00 MB</div>
+        <div class="savings-label">
+          <i class="fa-solid fa-circle-check"></i> <span id="labelResult">Optimizes roughly 6.2% of build images</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Copy Area -->
+  <section class="installer-section" id="install">
+    <h2 class="section-title">Universal One-Line Installer</h2>
+    <div class="panel installer-card">
+      <div class="installer-layout">
+        <p>RepoTrim is distributed as a statically linked single binary with zero dependencies. Run the POSIX bootstrap command to auto-detect and deploy the package for your host OS and CPU platform:</p>
+        
+        <div class="copy-container">
+          <div class="copy-text" id="installCommand">curl -sSL https://raw.githubusercontent.com/repotrim/repotrim/main/install.sh | sh</div>
+          <button class="copy-btn" onclick="copyToClipboard('installCommand')">
+            <i class="fa-regular fa-copy" id="copyIcon"></i>
+          </button>
+        </div>
+
+        <div class="installer-meta">
+          <span>Target Binaries: <strong>Linux / Darwin (macOS) / Windows</strong></span>
+          <span>Architectures: <strong>amd64 / arm64</strong></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-container">
+      <a href="#" class="footer-logo">
+        <i class="fa-solid fa-scissors"></i> RepoTrim
+      </a>
+      <ul class="footer-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#calculator">Estimator</a></li>
+        <li><a href="#install">Installation</a></li>
+      </ul>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 RepoTrim Core Engine Project. Statically compiled with Go Concurrency.
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    // Console Typewriter Data
+    const terminalLines = [
+      "<span style='color: #6ee7b7;'>[repotrim] $</span> export REPOTRIM_LICENSE_KEY=\"TEST_LICENSE_KEY\"",
+      "<span style='color: #6ee7b7;'>[repotrim] $</span> go run main.go -dir core/fixtures -format json",
+      "📂 Initializing RepoTrim Core Scanner...",
+      "⚡ Spawning parallel file crawler (4 workers active)...",
+      "🔍 Crawled files: Done (3 files discovered)",
+      "🧬 Compiling reference database...",
+      "🔍 Concurrently parsing AST token references... Done (1 references mapped)",
+      "🧬 Running Heuristics Rule Engine...",
+      "   • DUPLICATE CHECK: Skip (0 duplicates found)",
+      "   • LARGE MEDIA CHECK: Skip (0 oversized media found)",
+      "   • DEAD ASSET CHECK: Unreferenced file detected in fixtures folder!",
+      "   • Recommendation: [Delete] assets/abandoned_background.png (saves 42 B)",
+      "📈 Execution complete (duration: 9 ms)",
+      "",
+      "<span style='color: #38bdf8;'>{</span>",
+      "  <span style='color: #a78bfa;'>\"root_dir\":</span> \"/Users/dave/Projects/repotrim/core/fixtures\",",
+      "  <span style='color: #a78bfa;'>\"total_files_scanned\":</span> 3,",
+      "  <span style='color: #a78bfa;'>\"total_bytes_scanned\":</span> 205,",
+      "  <span style='color: #a78bfa;'>\"total_issues_found\":</span> 1,",
+      "  <span style='color: #a78bfa;'>\"total_savings_bytes\":</span> 42,",
+      "  <span style='color: #a78bfa;'>\"issues\":</span> [",
+      "    {",
+      "      <span style='color: #a78bfa;'>\"type\":</span> \"Unused Asset\",",
+      "      <span style='color: #a78bfa;'>\"file_path\":</span> \"assets/abandoned_background.png\",",
+      "      <span style='color: #a78bfa;'>\"details\":</span> \"No references found in source files or configuration files\",",
+      "      <span style='color: #a78bfa;'>\"savings_bytes\":</span> 42,",
+      "      <span style='color: #a78bfa;'>\"recommendation\":</span> \"Delete unused asset file\"",
+      "    }",
+      "  ],",
+      "  <span style='color: #a78bfa;'>\"initial_size_bytes\":</span> 77,",
+      "  <span style='color: #a78bfa;'>\"projected_savings_bytes\":</span> 42,",
+      "  <span style='color: #a78bfa;'>\"unused_assets\":</span> [",
+      "    \"assets/abandoned_background.png\"",
+      "  ],",
+      "  <span style='color: #a78bfa;'>\"protected_assets\":</span> []",
+      "<span style='color: #38bdf8;'>}</span>"
+    ];
+
+    const jsonText = `{
+  "root_dir": "/Users/dave/Projects/repotrim/core/fixtures",
+  "total_files_scanned": 3,
+  "total_bytes_scanned": 205,
+  "total_issues_found": 1,
+  "total_savings_bytes": 42,
+  "issues": [
+    {
+      "type": "Unused Asset",
+      "file_path": "assets/abandoned_background.png",
+      "details": "No references or imports found in source code or configs",
+      "savings_bytes": 42,
+      "recommendation": "Delete unused asset file"
+    }
+  ],
+  "initial_size_bytes": 77,
+  "projected_savings_bytes": 42,
+  "unused_assets": [
+    "assets/abandoned_background.png"
+  ],
+  "protected_assets": []
+}`;
+
+    const impactText = `📂 **RepoTrim Optimization Analysis Report**
+
+📊 **Metrics Overview:**
+   • Scanned Assets:      77 Bytes (icon_home.png & abandoned_background.png)
+   • Target Unused:       42 Bytes (abandoned_background.png)
+   • Protected Assets:    0 Bytes (icon_home.png matches exactly!)
+   
+📈 **Efficiency Gains:**
+   • Recovered Space:     42 Bytes (54.5% total reduction)
+   • CI/CD Speed Gain:    Reduced Git clone and dynamic caching cycles.
+   
+⚡ **Heuristics Verified:**
+   • Exact Base Match:    "icon_home" safely whitelists "icon_home.png".
+   • No Double Flagging:  Duplicate calculations do not double-warn unreferenced fields.`;
+
+    let currentTab = 'terminal';
+    let simulationActive = false;
+
+    // Run Terminal Typewriter Simulation
+    function runAnalysisSimulation() {
+      if (simulationActive) return;
+      simulationActive = true;
+      
+      const btn = document.getElementById('runSimBtn');
+      btn.style.display = 'none';
+
+      const container = document.getElementById('typewriterText');
+      container.innerHTML = '';
+      
+      let lineIndex = 0;
+      
+      function printLine() {
+        if (lineIndex < terminalLines.length) {
+          const p = document.createElement('div');
+          p.innerHTML = terminalLines[lineIndex] + "<span class='cursor'></span>";
+          container.appendChild(p);
+
+          // Scroll console automatically
+          const body = document.getElementById('consoleContent');
+          body.scrollTop = body.scrollHeight;
+
+          // Remove typewriter cursor from previous lines
+          setTimeout(() => {
+            const cursors = p.getElementsByClassName('cursor');
+            if (cursors.length > 0) cursors[0].remove();
+            lineIndex++;
+            printLine();
+          }, lineIndex < 14 ? 300 : 80); // Speed up JSON outputs
+        } else {
+          simulationActive = false;
+        }
+      }
+      
+      printLine();
+    }
+
+    // Switch Console Tabs
+    function switchConsoleTab(tab) {
+      currentTab = tab;
+      
+      // Update Tab button active state
+      const buttons = document.getElementsByClassName('console-tab-btn');
+      for (let btn of buttons) {
+        btn.classList.remove('active');
+      }
+      
+      // Add active state to correct button
+      event.currentTarget.classList.add('active');
+      
+      const container = document.getElementById('typewriterText');
+      const simBtn = document.getElementById('runSimBtn');
+      
+      if (tab === 'terminal') {
+        if (!simulationActive && container.innerHTML === '') {
+          simBtn.style.display = 'block';
+        } else {
+          simBtn.style.display = 'none';
+        }
+        // Let typewriter contain whatever it has, or if empty show run
+      } else if (tab === 'json') {
+        simBtn.style.display = 'none';
+        container.innerHTML = `<pre style="color: #6ee7b7;">${jsonText}</pre>`;
+      } else if (tab === 'impact') {
+        simBtn.style.display = 'none';
+        container.innerHTML = `<pre style="color: #c7d2fe; white-space: pre-wrap; font-family: var(--font-sans); line-height: 1.8;">${impactText}</pre>`;
+      }
+    }
+
+    // Live Savings Calculator Logic
+    function calculateSavings() {
+      const dupCount = parseInt(document.getElementById('dupCount').value);
+      const dupSize = parseFloat(document.getElementById('dupSize').value);
+      const scriptCount = parseInt(document.getElementById('scriptCount').value);
+      const scriptSize = parseInt(document.getElementById('scriptSize').value);
+      
+      // Update displayed slider values
+      document.getElementById('dupCountVal').innerText = dupCount;
+      document.getElementById('dupSizeVal').innerText = dupSize + " MB";
+      document.getElementById('scriptCountVal').innerText = scriptCount;
+      document.getElementById('scriptSizeVal').innerText = scriptSize + " KB";
+      
+      // Calculate
+      const dupSavings = dupCount * dupSize; // in MB
+      const scriptSavings = (scriptCount * scriptSize) / 1024; // in MB
+      const totalSavings = dupSavings + scriptSavings;
+      
+      // Update Savings text
+      document.getElementById('totalSavingsResult').innerText = totalSavings.toFixed(2) + " MB";
+      
+      // Update dynamic recommendation text
+      let imageCount = Math.round(totalSavings / 1.5);
+      if (imageCount < 1) imageCount = 1;
+      
+      let buildImpact = (totalSavings * 0.18).toFixed(1);
+      if (parseFloat(buildImpact) < 0.2) buildImpact = "0.2";
+      
+      document.getElementById('labelResult').innerText = `Reduces Git clone/cache cycles by ~${buildImpact}s (Equivalent to ${imageCount} high-res assets)`;
+    }
+
+    // Copy to Clipboard Utility
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const icon = document.getElementById('copyIcon');
+        icon.classList.remove('fa-regular', 'fa-copy');
+        icon.classList.add('fa-solid', 'fa-check');
+        icon.style.color = '#10b981';
+        
+        setTimeout(() => {
+          icon.classList.remove('fa-solid', 'fa-check');
+          icon.classList.add('fa-regular', 'fa-copy');
+          icon.style.color = '';
+        }, 2000);
+      });
+    }
+
+    // Initialize Calculator on load
+    window.onload = function() {
+      calculateSavings();
+    };
+  </script>
+</body>
+</html>

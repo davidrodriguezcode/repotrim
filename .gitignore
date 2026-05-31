@@ -1,0 +1,14 @@
+# RepoTrim Binaries
+repotrim
+repotrim.exe
+
+# GoReleaser artifacts
+dist/
+
+# Verification Environments
+test_workspace/
+
+# Standard Go ignores
+*.out
+*.test
+*.prof
