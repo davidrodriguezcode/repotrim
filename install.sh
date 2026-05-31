@@ -36,7 +36,7 @@ case "$ARCH_NAME" in
         ;;
 esac
 
-REPO_OWNER="repotrim"
+REPO_OWNER="davidrodriguezcode"
 REPO_NAME="repotrim"
 VERSION="latest"
 
