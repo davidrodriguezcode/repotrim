@@ -19,36 +19,6 @@
       gap: 3rem;
     }
 
-    @media (max-width: 968px) {
-      .docs-container {
-        grid-template-columns: 1fr;
-        margin: 2rem auto;
-        gap: 2rem;
-      }
-      .docs-sidebar {
-        position: static;
-        height: auto;
-        border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 1.5rem;
-      }
-      .docs-nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 1rem 1.5rem;
-      }
-      .docs-nav a {
-        border-left: none;
-        border-bottom: 2px solid transparent;
-        padding-left: 0;
-        padding-bottom: 0.25rem;
-      }
-      .docs-nav a:hover, .docs-nav a.active {
-        border-left-color: transparent;
-        border-bottom-color: var(--primary-accent);
-        padding-left: 0;
-      }
-    }
-
     /* Sidebar Navigation */
     .docs-sidebar {
       position: sticky;
@@ -78,6 +48,36 @@
       color: var(--text-primary);
       border-left-color: var(--primary-accent);
       padding-left: 1rem;
+    }
+
+    @media (max-width: 968px) {
+      .docs-container {
+        grid-template-columns: 1fr;
+        margin: 2rem auto;
+        gap: 2rem;
+      }
+      .docs-sidebar {
+        position: static;
+        height: auto;
+        border-bottom: 1px solid var(--panel-border);
+        padding-bottom: 1.5rem;
+      }
+      .docs-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+      }
+      .docs-nav a {
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        padding-left: 0;
+        padding-bottom: 0.25rem;
+      }
+      .docs-nav a:hover, .docs-nav a.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--primary-accent);
+        padding-left: 0;
+      }
     }
 
     /* Documentation Articles */
