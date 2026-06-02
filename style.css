@@ -75,6 +75,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem; /* Guarantees a minimum horizontal spacing between elements */
 }
 
 .logo-group {
@@ -143,6 +144,7 @@ header {
 @media (max-width: 1150px) and (min-width: 769px) {
   .nav-container {
     padding: 1rem 1.5rem;
+    gap: 1.25rem; /* Minimum gap buffer on smaller screens */
   }
   .nav-links {
     gap: 1rem;
