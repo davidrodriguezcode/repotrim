@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RepoTrim Documentation — Licensing Backend & API Guide</title>
-  <meta name="description" content="Official developer documentation for the RepoTrim licensing backend, Stripe webhook automation, and CLI integration.">
+  <title>RepoTrim Documentation — CLI Setup & Licensing Guide</title>
+  <meta name="description" content="User guide and setup documentation for integrating the RepoTrim CLI engine into local terminals and CI/CD pipelines.">
   <link rel="stylesheet" href="style.css">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -114,29 +114,6 @@
       border: 1px solid rgba(139, 92, 246, 0.2);
     }
 
-    /* Info Alerts */
-    .alert-panel {
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin: 1.5rem 0;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .alert-panel i {
-      color: var(--primary-accent);
-      font-size: 1.25rem;
-      margin-top: 0.2rem;
-    }
-
-    .alert-panel div p {
-      margin-bottom: 0;
-      font-size: 0.95rem;
-    }
-
     /* Live Validator Widget CSS */
     .validator-card {
       margin-top: 1.5rem;
@@ -236,7 +213,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="#licensing" class="active">Licensing Docs</a></li>
+        <li><a href="#setup" class="active">CLI User Guide</a></li>
         <li><a href="index.html#install">Universal Installer</a></li>
       </ul>
       <a href="index.html#install" class="cta-button">Install Binary</a>
@@ -249,118 +226,92 @@
     <!-- Sidebar Navigation -->
     <aside class="docs-sidebar">
       <ul class="docs-nav">
-        <li><a href="#licensing" class="active">1. Licensing & Verification</a></li>
-        <li><a href="#api" class="active">2. Verification API Reference</a></li>
-        <li><a href="#stripe">3. Stripe webhook integration</a></li>
-        <li><a href="#cli">4. CLI integration guide</a></li>
-        <li><a href="#validator">5. Live License Validator</a></li>
+        <li><a href="#setup" class="active">1. Getting Started</a></li>
+        <li><a href="#variables">2. Environment Configuration</a></li>
+        <li><a href="#cicd">3. CI/CD Integration</a></li>
+        <li><a href="#checker">4. License Key Status Checker</a></li>
+        <li><a href="#troubleshooting">5. Troubleshooting</a></li>
       </ul>
     </aside>
 
     <!-- Main Docs Content -->
     <div class="docs-content">
       
-      <!-- Article 1: Licensing & Verification Overview -->
-      <article class="docs-article" id="licensing">
-        <h2>Licensing & Verification</h2>
-        <p>RepoTrim uses a serverless licensing system backed by Google Firebase. This setup authenticates CI/CD runners, build servers, and local command-line users dynamically with minimal latency. High-performance caching layers keep response windows below 3 seconds.</p>
+      <!-- Article 1: Getting Started -->
+      <article class="docs-article" id="setup">
+        <h2>Getting Started</h2>
+        <p>RepoTrim requires a valid license key to run its concurrent scanning and ast parsing routines. You can acquire a license key directly from our website checkout flow. Once purchased, a license key prefixed with <code class="inline-code">rt_live_</code> will be emailed to you immediately.</p>
+        <p>This key must be configured in your environment to authenticate the CLI binary during local execution or automated runs inside your build pipelines.</p>
+      </article>
+
+      <!-- Article 2: Environment Configuration -->
+      <article class="docs-article" id="variables">
+        <h2>Environment Configuration</h2>
+        <p>To run RepoTrim in your local terminal, set the environment variable <code class="inline-code">REPOTRIM_LICENSE_KEY</code> before running the executable.</p>
         
-        <h3>Activation Models</h3>
-        <p>Licenses are checked on startup using the environment variable <code class="inline-code">REPOTRIM_LICENSE_KEY</code>. You can acquire a license through two primary pathways:</p>
-        <ul>
-          <li><strong>Option A (Automated)</strong>: Secure purchases via Stripe checkout instantly provision and save active keys to the central Firestore repository.</li>
-          <li><strong>Option B (Manual)</strong>: Developers can seed keys manually in the Firestore console under the <code class="inline-code">licenses</code> collection.</li>
-        </ul>
+        <h3>macOS and Linux (Bash/Zsh)</h3>
+        <p>Run the following commands in your shell:</p>
+        <pre class="code-block">
+export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
+repotrim -dir .</pre>
+        <p>To persist this variable so you don't need to type it in every new session, append the export line to your profile configuration file (e.g. <code class="inline-code">~/.bashrc</code>, <code class="inline-code">~/.zshrc</code>, or <code class="inline-code">~/.profile</code>).</p>
+
+        <h3>Windows (Command Prompt)</h3>
+        <pre class="code-block">
+set REPOTRIM_LICENSE_KEY=rt_live_your_actual_key
+repotrim.exe -dir .</pre>
+
+        <h3>Windows (PowerShell)</h3>
+        <pre class="code-block">
+$env:REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
+.\repotrim.exe -dir .</pre>
       </article>
 
-      <!-- Article 2: API Endpoint -->
-      <article class="docs-article" id="api">
-        <h2>Verification API Reference</h2>
-        <p>Outbound validation requests are processed through our custom endpoint. The gateway accepts JSON payloads over HTTPS POST requests.</p>
+      <!-- Article 3: CI/CD Integration -->
+      <article class="docs-article" id="cicd">
+        <h2>CI/CD Pipeline Integration</h2>
+        <p>Authenticate your build agents automatically by linking your RepoTrim license key into your integration workflows.</p>
         
-        <pre class="code-block">POST https://api.repotrim.innsoftlabs.com/v1/verify</pre>
-
-        <h3>Request Headers</h3>
-        <pre class="code-block">
-Content-Type: application/json
-Authorization: Bearer &lt;license_key&gt;</pre>
-
-        <h3>Request Body Payload</h3>
-        <pre class="code-block">
-{
-  "license_key": "rt_live_dbe6ff3b1396c7659145d9f5929d73fe"
-}</pre>
-
-        <h3>Success Response (HTTP 200)</h3>
-        <pre class="code-block">
-{
-  "valid": true
-}</pre>
-
-        <h3>Error Responses</h3>
-        <ul>
-          <li><code class="inline-code">HTTP 400 Bad Request</code>: Key missing or format error.</li>
-          <li><code class="inline-code">HTTP 402 Payment Required</code>: License subscription expired.</li>
-          <li><code class="inline-code">HTTP 403 Forbidden</code>: Key was suspended, revoked, or not found in the database.</li>
-        </ul>
-      </article>
-
-      <!-- Article 3: Stripe Integration -->
-      <article class="docs-article" id="stripe">
-        <h2>Stripe Webhook Integration</h2>
-        <p>Stripe automated key generation is supported via the hosted webhook. The webhook parses raw requests, checks cryptographic signatures, and provisions licenses automatically.</p>
+        <h3>GitHub Actions</h3>
+        <p>1. Go to your repository settings -> **Secrets and variables** -> **Actions** -> click **New repository secret**.<br>
+        2. Set the name to <code class="inline-code">REPOTRIM_LICENSE_KEY</code> and paste your key as the value.<br>
+        3. Reference the secret in your workflow YAML file:</p>
         
-        <h3>Stripe Dashboard Configuration</h3>
-        <p>Under your Stripe Dashboard developers section, add a new <strong>Destination</strong> with the following properties:</p>
-        <ul>
-          <li><strong>Destination URL</strong>: <code class="inline-code">https://api.repotrim.innsoftlabs.com/stripe-webhook</code></li>
-          <li><strong>Version</strong>: Latest Stable</li>
-          <li><strong>Event Subscriptions</strong>: <code class="inline-code">checkout.session.completed</code></li>
-        </ul>
+        <pre class="code-block">
+name: Repository Optimization Check
+on: [push]
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run RepoTrim
+        run: repotrim -dir .
+        env:
+          REPOTRIM_LICENSE_KEY: ${{ secrets.REPOTRIM_LICENSE_KEY }}</pre>
 
-        <div class="alert-panel">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <div>
-            <p><strong>Security Warning:</strong> Always verify webhook signatures inside the handler using the <code class="inline-code">STRIPE_WEBHOOK_SECRET</code>. The webhook signature is delivered in the HTTP Header <code class="inline-code">Stripe-Signature</code> and prevents request spoofing.</p>
-          </div>
-        </div>
+        <h3>GitLab CI/CD</h3>
+        <p>1. Navigate to **Settings** -> **CI/CD** -> **Variables**.<br>
+        2. Add a new variable named <code class="inline-code">REPOTRIM_LICENSE_KEY</code> with your key.<br>
+        3. Update your <code class="inline-code">.gitlab-ci.yml</code> file:</p>
+        <pre class="code-block">
+repotrim_scan:
+  stage: test
+  script:
+    - repotrim -dir .
+  variables:
+    REPOTRIM_LICENSE_KEY: $REPOTRIM_LICENSE_KEY</pre>
       </article>
 
-      <!-- Article 4: CLI Integration -->
-      <article class="docs-article" id="cli">
-        <h2>CLI Integration Guide</h2>
-        <p>Incorporate RepoTrim into your local terminals and CI/CD pipelines by setting the environment variable before calling the binary.</p>
-
-        <h3>1. Local Environment Setup</h3>
-        <p>Add the following environment variable to your terminal session or shell configuration (<code class="inline-code">.bashrc</code> or <code class="inline-code">.zshrc</code>):</p>
-        <pre class="code-block">
-export REPOTRIM_LICENSE_KEY="rt_live_..."
-./repotrim -dir .</pre>
-
-        <h3>2. Github Actions CI/CD Pipeline</h3>
-        <p>Add your license key as a repository secret (<code class="inline-code">REPOTRIM_LICENSE_KEY</code>) and reference it in your workflow file:</p>
-        <pre class="code-block">
-- name: Run RepoTrim Asset Scan
-  run: ./repotrim -dir .
-  env:
-    REPOTRIM_LICENSE_KEY: ${{ secrets.REPOTRIM_LICENSE_KEY }}</pre>
-
-        <h3>3. Developer Offline Bypass</h3>
-        <p>For testing, development environments, and unit testing pipelines, you can use the hardcoded offline bypass key without needing network access:</p>
-        <pre class="code-block">
-export REPOTRIM_LICENSE_KEY="TEST_LICENSE_KEY"
-./repotrim -dir .</pre>
-      </article>
-
-      <!-- Article 5: Live License Validator Widget -->
-      <article class="docs-article" id="validator">
-        <h2>Live License Validator</h2>
-        <p>Test your license verification live. Enter your RepoTrim key below (e.g. your active key or the offline developer bypass key) to validate its status directly against our Firebase production database.</p>
+      <!-- Article 4: License Status Checker -->
+      <article class="docs-article" id="checker">
+        <h2>License Key Status Checker</h2>
+        <p>Use the status checker below to test if your license key is currently active and authenticated in our licensing database.</p>
 
         <div class="panel validator-card">
           <div class="validator-form">
-            <input type="text" id="licenseKeyInput" class="validator-input" placeholder="rt_live_..." value="rt_live_363d62b25861948d185a7efa035a0624">
-            <button class="validator-btn" onclick="validateKeyLive()">Validate Key</button>
+            <input type="text" id="licenseKeyInput" class="validator-input" placeholder="rt_live_..." value="">
+            <button class="validator-btn" onclick="validateKeyLive()">Check Key Status</button>
           </div>
           
           <!-- Badges for Results -->
@@ -368,12 +319,26 @@ export REPOTRIM_LICENSE_KEY="TEST_LICENSE_KEY"
             <i class="fa-solid fa-spinner fa-spin"></i> Contacting licensing gateway...
           </div>
           <div id="badgeValid" class="result-badge valid">
-            <i class="fa-solid fa-circle-check"></i> Success: License key is valid and active in production.
+            <i class="fa-solid fa-circle-check"></i> Success: Your license key is valid and active.
           </div>
           <div id="badgeInvalid" class="result-badge invalid">
-            <i class="fa-solid fa-circle-xmark"></i> Failure: License key not found, revoked, or expired.
+            <i class="fa-solid fa-circle-xmark"></i> Failure: License key not found, expired, or suspended.
           </div>
         </div>
+      </article>
+
+      <!-- Article 5: Troubleshooting -->
+      <article class="docs-article" id="troubleshooting">
+        <h2>Troubleshooting</h2>
+        
+        <h3>Error: REPOTRIM_LICENSE_KEY environment variable is not set</h3>
+        <p>The CLI engine could not locate the key in your terminal context. Ensure you have run the <code class="inline-code">export</code> or <code class="inline-code">set</code> commands in the same terminal window where you are executing the binary.</p>
+
+        <h3>Error: The provided REPOTRIM_LICENSE_KEY is invalid, forbidden, or expired</h3>
+        <p>This message occurs if the key is unrecognized in the verification server, has been suspended, or its subscription term has expired. Use the <strong>License Key Status Checker</strong> above to check its status, or contact us at <code class="inline-code">support@repotrim.com</code> if you believe this is in error.</p>
+
+        <h3>Error: Licensing server unreachable</h3>
+        <p>RepoTrim attempts to connect to the authentication endpoint on startup. Ensure your system has an active internet connection and that outbound traffic to <code class="inline-code">api.repotrim.innsoftlabs.com</code> on port <code class="inline-code">443</code> is not blocked by your firewall or VPN.</p>
       </article>
 
     </div>
@@ -405,7 +370,6 @@ export REPOTRIM_LICENSE_KEY="TEST_LICENSE_KEY"
       const badgeValid = document.getElementById('badgeValid');
       const badgeInvalid = document.getElementById('badgeInvalid');
 
-      // Hide previous states
       badgeLoading.style.display = 'none';
       badgeValid.style.display = 'none';
       badgeInvalid.style.display = 'none';
@@ -454,7 +418,6 @@ export REPOTRIM_LICENSE_KEY="TEST_LICENSE_KEY"
       let current = '';
       articles.forEach(article => {
         const articleTop = article.offsetTop;
-        const articleHeight = article.clientHeight;
         if (pageYOffset >= (articleTop - 120)) {
           current = article.getAttribute('id');
         }
