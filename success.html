@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful — RepoTrim</title>
+  <meta name="description" content="Thank you for purchasing RepoTrim! Your license key is active and ready to be used.">
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .success-container {
+      max-width: 600px;
+      margin: 8rem auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .success-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 2rem;
+      font-size: 2.5rem;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .success-card {
+      padding: 3rem 2rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .success-card h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff 50%, var(--success) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .success-card p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .action-group a {
+      text-decoration: none;
+      padding: 0.85rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-accent) 0%, var(--secondary-accent) 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo-group">
+        <i class="fa-solid fa-scissors"></i> RepoTrim
+      </a>
+    </div>
+  </header>
+
+  <main class="success-container">
+    <div class="success-card">
+      <div class="success-icon-wrapper">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h1>Purchase Complete!</h1>
+      <p>Thank you for purchasing a RepoTrim license key. Your license is now active! We have generated and sent your license key to your billing email address. Please check your inbox (and spam folder) within the next few minutes.</p>
+      
+      <div class="action-group">
+        <a href="docs.html" class="btn-primary">
+          <i class="fa-solid fa-book"></i> Read CLI Setup Documentation
+        </a>
+        <a href="index.html" class="btn-secondary">
+          Return to Home Page
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-copy" style="margin-top: 4rem;">
+      &copy; 2026 RepoTrim Core Engine Project. Statically compiled with Go Concurrency.
+    </div>
+  </footer>
+
+</body>
+</html>
