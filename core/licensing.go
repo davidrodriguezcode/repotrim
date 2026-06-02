@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -34,7 +35,12 @@ func VerifyLicense(key string) (bool, error) {
 		Timeout: 3 * time.Second,
 	}
 
-	req, err := http.NewRequest("POST", "https://api.repotrim.com/v1/verify", bytes.NewBuffer(payload))
+	apiURL := os.Getenv("REPOTRIM_API_URL")
+	if apiURL == "" {
+		apiURL = "https://api.repotrim.innsoftlabs.com/v1/verify"
+	}
+
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(payload))
 	if err != nil {
 		return false, fmt.Errorf("failed to create http request: %w", err)
 	}
