@@ -71,7 +71,7 @@ RepoTrim requires the `REPOTRIM_LICENSE_KEY` environment variable to execute. Fo
 
 The entry point enforces licensing gates via `VerifyLicense` inside `core/licensing.go`:
 - Outbound verification hits `https://api.repotrim.innsoftlabs.com/v1/verify` using a `POST` request carrying the bearer token.
-- Outbound network requests timeout cleanly after `3 seconds` to prevent pipelines from stalling.
+- Outbound network requests timeout cleanly after `10 seconds` to prevent pipelines from stalling.
 - Network lookups or unreachable unroutable states resolve gracefully with standard, human-readable terminal alerts rather than panicking or crashing.
 
 To run offline in local sandboxes or unit test environments, export the developer bypass key:

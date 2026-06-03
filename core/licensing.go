@@ -30,9 +30,9 @@ func VerifyLicense(key string) (bool, error) {
 		return false, fmt.Errorf("failed to marshal payload: %w", err)
 	}
 
-	// Create client with 3-second timeout
+	// Create client with 10-second timeout to accommodate serverless cold starts
 	client := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 10 * time.Second,
 	}
 
 	apiURL := os.Getenv("REPOTRIM_API_URL")
