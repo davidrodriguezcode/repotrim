@@ -129,17 +129,35 @@
     }
 
     /* Code Block Styling */
+    .code-container {
+      position: relative;
+      margin: 1.25rem 0;
+    }
+
     pre.code-block {
       background: rgba(17, 25, 40, 0.9);
       border: 1px solid var(--panel-border);
       border-radius: 12px;
       padding: 1.25rem;
+      padding-right: 3.5rem; /* Make room for the copy button */
       overflow-x: auto;
       font-family: var(--font-mono);
       font-size: 0.9rem;
       color: #6ee7b7;
-      margin: 1.25rem 0;
+      margin: 0;
       line-height: 1.5;
+    }
+
+    .code-container .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      opacity: 0.6;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+
+    .code-container:hover .copy-btn {
+      opacity: 1;
     }
 
     code.inline-code {
@@ -286,37 +304,61 @@
         
         <h3>macOS and Linux (Bash/Zsh)</h3>
         <p>Run the following commands in your shell:</p>
-        <pre class="code-block">
-export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
+        <div class="code-container">
+          <pre class="code-block" id="codeMac">export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
 ./repotrim -dir .</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeMac', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
         
         <p>To persist this variable so you don't need to type it in every new session, write it directly to your shell profile configuration:</p>
         
         <h4>For Zsh (Default macOS shell):</h4>
-        <pre class="code-block">
-echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.zshrc
+        <div class="code-container">
+          <pre class="code-block" id="codeZsh">echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.zshrc
 source ~/.zshrc</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeZsh', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
         <h4>For Bash (Common Linux shell):</h4>
-        <pre class="code-block">
-echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.bashrc
+        <div class="code-container">
+          <pre class="code-block" id="codeBash">echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.bashrc
 source ~/.bashrc</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeBash', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
         <h3>Windows (Command Prompt)</h3>
         <p>Temporary session setup:</p>
-        <pre class="code-block">
-set REPOTRIM_LICENSE_KEY=rt_live_your_actual_key
+        <div class="code-container">
+          <pre class="code-block" id="codeWinCmd">set REPOTRIM_LICENSE_KEY=rt_live_your_actual_key
 repotrim.exe -dir .</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeWinCmd', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
         <h3>Windows (PowerShell)</h3>
         <p>Temporary session setup:</p>
-        <pre class="code-block">
-$env:REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
+        <div class="code-container">
+          <pre class="code-block" id="codeWinPs">$env:REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
 .\repotrim.exe -dir .</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeWinPs', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
         <p>To persist this variable permanently on Windows, execute this command in PowerShell:</p>
-        <pre class="code-block">
-[Environment]::SetEnvironmentVariable("REPOTRIM_LICENSE_KEY", "rt_live_your_actual_key", "User")</pre>
+        <div class="code-container">
+          <pre class="code-block" id="codeWinPersist">[Environment]::SetEnvironmentVariable("REPOTRIM_LICENSE_KEY", "rt_live_your_actual_key", "User")</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeWinPersist', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
       </article>
 
       <!-- Article 3: CI/CD Integration -->
@@ -329,8 +371,8 @@ $env:REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
         2. Set the name to <code class="inline-code">REPOTRIM_LICENSE_KEY</code> and paste your key as the value.<br>
         3. Reference the secret in your workflow YAML file:</p>
         
-        <pre class="code-block">
-name: Repository Optimization Check
+        <div class="code-container">
+          <pre class="code-block" id="codeGhActions">name: Repository Optimization Check
 on: [push]
 jobs:
   optimize:
@@ -341,19 +383,26 @@ jobs:
         run: repotrim -dir .
         env:
           REPOTRIM_LICENSE_KEY: ${{ secrets.REPOTRIM_LICENSE_KEY }}</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeGhActions', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
         <h3>GitLab CI/CD</h3>
         <p>1. Navigate to **Settings** -> **CI/CD** -> **Variables**.<br>
         2. Add a new variable named <code class="inline-code">REPOTRIM_LICENSE_KEY</code> with your key.<br>
         3. Update your <code class="inline-code">.gitlab-ci.yml</code> file:</p>
-        <pre class="code-block">
-repotrim_scan:
+        <div class="code-container">
+          <pre class="code-block" id="codeGitLab">repotrim_scan:
   stage: test
   script:
     - repotrim -dir .
   variables:
     REPOTRIM_LICENSE_KEY: $REPOTRIM_LICENSE_KEY</pre>
-      </article>
+          <button class="copy-btn" onclick="copyToClipboard('codeGitLab', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
 
       <!-- Article 4: License Status Checker -->
       <article class="docs-article" id="checker">
@@ -480,8 +529,24 @@ repotrim_scan:
         if (link.getAttribute('href') === '#' + current) {
           link.classList.add('active');
         }
-      });
     });
+
+    // Copy to Clipboard Utility
+    function copyToClipboard(textId, btnElement) {
+      const text = document.getElementById(textId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const icon = btnElement.querySelector('i');
+        icon.classList.remove('fa-regular', 'fa-copy');
+        icon.classList.add('fa-solid', 'fa-check');
+        icon.style.color = '#10b981';
+        
+        setTimeout(() => {
+          icon.classList.remove('fa-solid', 'fa-check');
+          icon.classList.add('fa-regular', 'fa-copy');
+          icon.style.color = '';
+        }, 2000);
+      });
+    }
   </script>
 </body>
 </html>
