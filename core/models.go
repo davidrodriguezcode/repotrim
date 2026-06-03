@@ -6,10 +6,13 @@ import "time"
 type BloatIssueType string
 
 const (
-	UnusedAsset    BloatIssueType = "Unused Asset"
-	DuplicateAsset BloatIssueType = "Duplicate Asset"
-	UnusedConfig   BloatIssueType = "Unused Configuration"
-	LargeMedia     BloatIssueType = "Large Media Asset"
+	UnusedAsset        BloatIssueType = "Unused Asset"
+	DuplicateAsset     BloatIssueType = "Duplicate Asset"
+	UnusedConfig       BloatIssueType = "Unused Configuration"
+	LargeMedia         BloatIssueType = "Large Media Asset"
+	EmptyDirectory     BloatIssueType = "Empty Directory"
+	LfsTrackingWarning BloatIssueType = "Git LFS Tracking Warning"
+	TrackedIgnoredFile BloatIssueType = "Tracked Ignored File"
 )
 
 // Asset represents a file scanned in the repository.
@@ -60,4 +63,16 @@ type AnalysisReport struct {
 	ProjectedSavingsBytes int64    `json:"projected_savings_bytes"`
 	UnusedAssets          []string `json:"unused_assets"`
 	ProtectedAssets       []string `json:"protected_assets"`
+
+	// Execution actions taken/simulated
+	ActionsTaken     []ActionLog `json:"actions_taken,omitempty"`
+	ActionsSimulated []ActionLog `json:"actions_simulated,omitempty"`
+}
+
+// ActionLog records a pruning or modification action taken by RepoTrim.
+type ActionLog struct {
+	Action  string `json:"action"`  // e.g. "delete", "replace_reference", "remove_dir"
+	Path    string `json:"path"`    // File/dir path acted upon
+	Target  string `json:"target"`  // e.g. replacement string or value, if applicable
+	Details string `json:"details"` // Explanation of action
 }

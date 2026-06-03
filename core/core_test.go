@@ -167,12 +167,13 @@ func TestAnalyzer(t *testing.T) {
 	// 1. Unused asset: "assets/unused.png"
 	// 2. Duplicate asset: "assets/logo_copy.png" (duplicate of "assets/logo.png")
 	// 3. Large media: "assets/large.mp4" (warning only, savings is 0)
+	// 4. Lfs tracking warning: "assets/large.mp4" (not tracked by Git LFS)
 
-	if report.TotalIssuesFound != 3 {
-		t.Errorf("Expected 3 issues, got %d", report.TotalIssuesFound)
+	if report.TotalIssuesFound != 4 {
+		t.Errorf("Expected 4 issues, got %d", report.TotalIssuesFound)
 	}
 
-	var foundUnused, foundDup, foundLarge bool
+	var foundUnused, foundDup, foundLarge, foundLfs bool
 	for _, issue := range report.Issues {
 		switch issue.Type {
 		case UnusedAsset:
@@ -196,6 +197,10 @@ func TestAnalyzer(t *testing.T) {
 					t.Errorf("Expected savings of 0 bytes for large media warning, got %d", issue.SavingsBytes)
 				}
 			}
+		case LfsTrackingWarning:
+			if issue.FilePath == "assets/large.mp4" {
+				foundLfs = true
+			}
 		}
 	}
 
@@ -207,5 +212,92 @@ func TestAnalyzer(t *testing.T) {
 	}
 	if !foundLarge {
 		t.Error("Missing expected LargeMedia issue for assets/large.mp4")
+	}
+	if !foundLfs {
+		t.Error("Missing expected LfsTrackingWarning issue for assets/large.mp4")
+	}
+}
+
+func TestXcodeBoilerplateFilter(t *testing.T) {
+	assets := []Asset{
+		{
+			Path:      "/project/App.xcassets/Contents.json",
+			RelPath:   "App.xcassets/Contents.json",
+			Size:      63,
+			Extension: ".json",
+			SHA256:    "hash-meta",
+		},
+		{
+			Path:      "/project/App.xcassets/Onboarding/Contents.json",
+			RelPath:   "App.xcassets/Onboarding/Contents.json",
+			Size:      63,
+			Extension: ".json",
+			SHA256:    "hash-meta", // Same hash, duplicate!
+		},
+	}
+	analyzer := NewAnalyzer(assets, nil)
+	report := analyzer.Analyze("/project", 0)
+
+	// Since they are inside .xcassets and named Contents.json, they must be ignored from duplicate detection!
+	for _, issue := range report.Issues {
+		if issue.Type == DuplicateAsset {
+			t.Errorf("Boilerplate Contents.json inside .xcassets should be ignored for duplicates, but found issue: %v", issue)
+		}
+	}
+}
+
+func TestLfsMatching(t *testing.T) {
+	patterns := []string{"*.png", "assets/**/*.mp4", "large_file.zip"}
+
+	tests := []struct {
+		path     string
+		expected bool
+	}{
+		{"assets/logo.png", true},
+		{"logo.png", true},
+		{"assets/video.mp4", true},
+		{"large_file.zip", true},
+		{"assets/small.mp3", false},
+	}
+
+	for _, tc := range tests {
+		matched := matchesLfsPattern(tc.path, patterns)
+		if matched != tc.expected {
+			t.Errorf("Expected path '%s' LFS match to be %t, got %t", tc.path, tc.expected, matched)
+		}
+	}
+}
+
+func TestEmptyDirectoryCleaner(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "repotrim-test-empty-*")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	// Create empty folder
+	emptySub := filepath.Join(tempDir, "empty_folder")
+	if err := os.Mkdir(emptySub, 0755); err != nil {
+		t.Fatalf("Failed to create subfolder: %v", err)
+	}
+
+	// Create non-empty folder
+	nonEmptySub := filepath.Join(tempDir, "non_empty_folder")
+	if err := os.Mkdir(nonEmptySub, 0755); err != nil {
+		t.Fatalf("Failed to create subfolder: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(nonEmptySub, "file.txt"), []byte("data"), 0644); err != nil {
+		t.Fatalf("Failed to write file: %v", err)
+	}
+
+	analyzer := NewAnalyzer(nil, nil)
+	issues := analyzer.findEmptyDirectories(tempDir)
+
+	// We expect exactly 1 empty directory issue: "empty_folder"
+	if len(issues) != 1 {
+		t.Fatalf("Expected 1 empty directory issue, got %d", len(issues))
+	}
+	if issues[0].FilePath != "empty_folder" {
+		t.Errorf("Expected empty directory to be 'empty_folder', got '%s'", issues[0].FilePath)
 	}
 }

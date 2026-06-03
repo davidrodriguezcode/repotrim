@@ -65,6 +65,38 @@ RepoTrim requires the `REPOTRIM_LICENSE_KEY` environment variable to execute. Fo
     REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY ./repotrim -dir test_workspace -format json
     ```
 
+### 5. Advanced Maintenance & Cleanup Features
+
+RepoTrim includes advanced execution flags to safely optimize your workspace:
+
+*   **Dry-Run Mode (Simulation)**:
+    Simulates all cleanup actions (deletes, reference updates) without writing changes to disk:
+    ```bash
+    REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY repotrim -dir test_workspace -dry-run
+    ```
+
+*   **Interactive Fix / Pruning Mode**:
+    Prompts for confirmation before deleting unused files, empty directories, or updating duplicate references:
+    ```bash
+    REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY repotrim -dir test_workspace -fix
+    ```
+    To automatically apply all fixes (e.g., in headless CI/CD scripts), use `-force`:
+    ```bash
+    REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY repotrim -dir test_workspace -fix -force
+    ```
+
+*   **Auto-Rollback on Verification Failure**:
+    Protects your codebase by executing a build/test verification command after pruning. If it fails, RepoTrim automatically rolls back all changes to keep your build green:
+    ```bash
+    REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY repotrim -dir test_workspace -fix -verify-cmd "go test ./..."
+    ```
+
+*   **Export Action Report**:
+    Exports the JSON findings and logs of actions taken to a file:
+    ```bash
+    REPOTRIM_LICENSE_KEY=TEST_LICENSE_KEY repotrim -dir test_workspace -report-file report.json
+    ```
+
 ---
 
 ## 🔒 License Verification

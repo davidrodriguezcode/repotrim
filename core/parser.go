@@ -195,6 +195,16 @@ func (p *Parser) isBinary(ext string) bool {
 		".woff2":true,
 		".ttf":  true,
 		".eot":  true,
+		".o":    true,
+		".a":    true,
+		".framework": true,
+		".app":  true,
+		".nib":  true,
+		".car":  true,
+		".bin":  true,
+		".db":   true,
+		".sqlite": true,
+		".ds_store": true,
 	}
 	return binaries[ext]
 }

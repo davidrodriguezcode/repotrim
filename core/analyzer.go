@@ -1,8 +1,12 @@
 package core
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -42,6 +46,18 @@ func (a *Analyzer) Analyze(rootDir string, durationMs int64) AnalysisReport {
 	// 3. Analyze Large Assets (skipping duplicates and unused assets)
 	largeIssues := a.analyzeLargeAssets(duplicatedPaths)
 	issues = append(issues, largeIssues...)
+
+	// 4. Analyze Empty Directories
+	emptyDirIssues := a.findEmptyDirectories(rootDir)
+	issues = append(issues, emptyDirIssues...)
+
+	// 5. Analyze Git LFS configuration
+	lfsIssues := a.analyzeLfsTracking(rootDir)
+	issues = append(issues, lfsIssues...)
+
+	// 6. Analyze Tracked Ignored Files
+	ignoredIssues := a.analyzeTrackedIgnored(rootDir)
+	issues = append(issues, ignoredIssues...)
 
 	// Calculate total savings
 	var totalSavings int64
@@ -125,6 +141,11 @@ func (a *Analyzer) analyzeDuplicates() ([]BloatIssue, map[string]bool) {
 
 	for _, asset := range a.assets {
 		if asset.SHA256 != "" && asset.Size > 0 {
+			// Skip boilerplate Contents.json files inside .xcassets folders (standard Xcode metadata)
+			relLower := strings.ToLower(filepath.ToSlash(asset.RelPath))
+			if strings.Contains(relLower, ".xcassets/") && strings.HasSuffix(relLower, "contents.json") {
+				continue
+			}
 			hashMap[asset.SHA256] = append(hashMap[asset.SHA256], asset)
 		}
 	}
@@ -322,4 +343,259 @@ func (a *Analyzer) checkReference(asset Asset) (bool, bool) {
 	}
 
 	return false, false
+}
+
+// findEmptyDirectories walks the target rootDir and flags empty directories.
+func (a *Analyzer) findEmptyDirectories(rootDir string) []BloatIssue {
+	var issues []BloatIssue
+
+	err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(rootDir, path)
+		if err != nil || relPath == "." || relPath == "" {
+			return nil
+		}
+
+		// Skip hidden folders like .git, and common dependency dirs
+		relPathLower := strings.ToLower(filepath.ToSlash(relPath))
+		if strings.HasPrefix(relPathLower, ".git") || strings.Contains(relPathLower, "/.git") ||
+			strings.Contains(relPathLower, "node_modules") || strings.Contains(relPathLower, "vendor") {
+			return nil
+		}
+
+		empty, err := isDirEmpty(path)
+		if err == nil && empty {
+			issues = append(issues, BloatIssue{
+				Type:           EmptyDirectory,
+				FilePath:       relPath,
+				Details:        "This directory contains no files or subdirectories",
+				SavingsBytes:   0,
+				Recommendation: "Delete this empty directory to maintain workspace cleanliness",
+			})
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil
+	}
+	return issues
+}
+
+// isDirEmpty checks recursively if a directory contains any files or active subfolders.
+func isDirEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	names, err := f.Readdirnames(-1)
+	if err != nil {
+		return false, err
+	}
+
+	if len(names) == 0 {
+		return true, nil
+	}
+
+	for _, n := range names {
+		// Ignore hidden files like .DS_Store from preventing a directory from being empty
+		if n == ".DS_Store" {
+			continue
+		}
+		childPath := filepath.Join(name, n)
+		childInfo, err := os.Stat(childPath)
+		if err != nil {
+			continue
+		}
+		if !childInfo.IsDir() {
+			return false, nil
+		}
+		empty, err := isDirEmpty(childPath)
+		if err != nil || !empty {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// parseGitAttributes parses patterns from a local .gitattributes file.
+func parseGitAttributes(rootDir string) ([]string, error) {
+	path := filepath.Join(rootDir, ".gitattributes")
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var patterns []string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if strings.Contains(line, "filter=lfs") || strings.Contains(line, "merge=lfs") {
+			parts := strings.Fields(line)
+			if len(parts) > 0 {
+				patterns = append(patterns, parts[0])
+			}
+		}
+	}
+	return patterns, nil
+}
+
+// matchesLfsPattern determines if a path satisfies a Git LFS attribute.
+func matchesLfsPattern(relPath string, patterns []string) bool {
+	relPathNorm := filepath.ToSlash(relPath)
+	base := filepath.Base(relPath)
+
+	for _, pattern := range patterns {
+		patternNorm := filepath.ToSlash(pattern)
+		
+		// If pattern doesn't contain a slash, it matches the base name of the file
+		if !strings.Contains(patternNorm, "/") {
+			if matchGitPattern(patternNorm, base) {
+				return true
+			}
+		} else {
+			// Otherwise it matches the relative path
+			patternNorm = strings.TrimPrefix(patternNorm, "/")
+			if matchGitPattern(patternNorm, relPathNorm) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// matchGitPattern handles standard Git glob wildcard translations.
+func matchGitPattern(pattern, path string) bool {
+	pattern = filepath.ToSlash(pattern)
+	path = filepath.ToSlash(path)
+
+	if strings.HasPrefix(pattern, "*.") {
+		ext := strings.TrimPrefix(pattern, "*")
+		return strings.HasSuffix(path, ext)
+	}
+
+	reStr := "^"
+	for i := 0; i < len(pattern); i++ {
+		c := pattern[i]
+		switch c {
+		case '.':
+			reStr += "\\."
+		case '*':
+			if i+1 < len(pattern) && pattern[i+1] == '*' {
+				reStr += ".*"
+				i++
+				// Skip trailing slash if "**/"
+				if i+1 < len(pattern) && pattern[i+1] == '/' {
+					i++
+				}
+			} else {
+				reStr += "[^/]*"
+			}
+		case '?':
+			reStr += "[^/]"
+		case '/':
+			reStr += "/"
+		default:
+			reStr += string(c)
+		}
+	}
+	reStr += "$"
+
+	re, err := regexp.Compile(reStr)
+	if err != nil {
+		return strings.Contains(path, pattern)
+	}
+	return re.MatchString(path)
+}
+
+// analyzeLfsTracking flags oversized files not tracked via Git LFS.
+func (a *Analyzer) analyzeLfsTracking(rootDir string) []BloatIssue {
+	var issues []BloatIssue
+	patterns, _ := parseGitAttributes(rootDir)
+
+	const threshold = 5 * 1024 * 1024
+	mediaExts := map[string]bool{
+		".png":  true,
+		".jpg":  true,
+		".jpeg": true,
+		".gif":  true,
+		".mp4":  true,
+		".mp3":  true,
+		".zip":  true,
+		".gz":   true,
+		".tar":  true,
+		".pdf":  true,
+	}
+
+	for _, asset := range a.assets {
+		if asset.Size > threshold && mediaExts[asset.Extension] {
+			if !matchesLfsPattern(asset.RelPath, patterns) {
+				issues = append(issues, BloatIssue{
+					Type:           LfsTrackingWarning,
+					FilePath:       asset.RelPath,
+					Details:        fmt.Sprintf("Large media asset (%.2f MB) is not tracked by Git LFS in .gitattributes", float64(asset.Size)/(1024*1024)),
+					SavingsBytes:   0,
+					Recommendation: fmt.Sprintf("Add '%s filter=lfs diff=lfs merge=lfs -text' to your .gitattributes file", asset.Extension),
+				})
+			}
+		}
+	}
+	return issues
+}
+
+// analyzeTrackedIgnored finds files listed in gitignore but currently checked into Git history.
+func (a *Analyzer) analyzeTrackedIgnored(rootDir string) []BloatIssue {
+	var issues []BloatIssue
+
+	gitCheck := exec.Command("git", "rev-parse", "--is-inside-work-tree")
+	gitCheck.Dir = rootDir
+	if err := gitCheck.Run(); err != nil {
+		return nil
+	}
+
+	cmd := exec.Command("git", "ls-files", "-i", "--exclude-standard")
+	cmd.Dir = rootDir
+	output, err := cmd.Output()
+	if err != nil {
+		return nil
+	}
+
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		relPath := strings.TrimSpace(line)
+		if relPath == "" {
+			continue
+		}
+
+		var size int64
+		for _, asset := range a.assets {
+			if filepath.ToSlash(asset.RelPath) == filepath.ToSlash(relPath) {
+				size = asset.Size
+				break
+			}
+		}
+
+		issues = append(issues, BloatIssue{
+			Type:           TrackedIgnoredFile,
+			FilePath:       relPath,
+			Details:        "This file is listed in .gitignore but is currently tracked in the Git repository",
+			SavingsBytes:   size,
+			Recommendation: fmt.Sprintf("Remove from git tracking using: git rm --cached %s", relPath),
+		})
+	}
+
+	return issues
 }

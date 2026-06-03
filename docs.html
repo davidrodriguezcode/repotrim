@@ -281,9 +281,10 @@
       <ul class="docs-nav">
         <li><a href="#setup" class="active">1. Getting Started</a></li>
         <li><a href="#variables">2. Environment Configuration</a></li>
-        <li><a href="#cicd">3. CI/CD Integration</a></li>
-        <li><a href="#checker">4. License Key Status Checker</a></li>
-        <li><a href="#troubleshooting">5. Troubleshooting</a></li>
+        <li><a href="#pruning">3. Pruning & Maintenance</a></li>
+        <li><a href="#cicd">4. CI/CD Integration</a></li>
+        <li><a href="#checker">5. License Key Checker</a></li>
+        <li><a href="#troubleshooting">6. Troubleshooting</a></li>
       </ul>
     </aside>
 
@@ -361,7 +362,56 @@ repotrim.exe -dir .</pre>
         </div>
       </article>
 
-      <!-- Article 3: CI/CD Integration -->
+      <!-- Article 3: Pruning & Maintenance -->
+      <article class="docs-article" id="pruning">
+        <h2>Pruning & Maintenance</h2>
+        <p>RepoTrim includes advanced execution flags to safely prune unused assets, resolve duplicate files, untrack gitignored files, and remove empty directories.</p>
+        
+        <h3>Dry-Run Mode (Simulation)</h3>
+        <p>Simulate all optimization actions without writing any changes to your files. This is recommended before executing any active pruning operations:</p>
+        <div class="code-container">
+          <pre class="code-block" id="codeDryRun">repotrim -dir . -dry-run</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeDryRun', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+
+        <h3>Interactive Fix Mode</h3>
+        <p>Run RepoTrim in interactive pruning mode. You will be prompted to confirm each delete or reference replacement individually:</p>
+        <div class="code-container">
+          <pre class="code-block" id="codeFix">repotrim -dir . -fix</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeFix', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+        <p>To skip confirmations (e.g. inside automated headless shell scripts), append the <code class="inline-code">-force</code> flag:</p>
+        <div class="code-container">
+          <pre class="code-block" id="codeForce">repotrim -dir . -fix -force</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeForce', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+
+        <h3>Auto-Rollback on Verification Failure</h3>
+        <p>To prevent pruning from breaking your project compilation or tests, use the <code class="inline-code">-verify-cmd</code> flag. RepoTrim will execute the verification command after completing fixes. If it fails, all deleted files and reference modifications are automatically restored:</p>
+        <div class="code-container">
+          <pre class="code-block" id="codeVerify">repotrim -dir . -fix -verify-cmd "go test ./..."</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeVerify', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+
+        <h3>Saving Execution Reports</h3>
+        <p>Export the findings and details of the execution (including the exact actions taken during pruning) to a structured JSON file:</p>
+        <div class="code-container">
+          <pre class="code-block" id="codeReportFile">repotrim -dir . -report-file report.json</pre>
+          <button class="copy-btn" onclick="copyToClipboard('codeReportFile', this)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+      </article>
+
+      <!-- Article 4: CI/CD Integration -->
       <article class="docs-article" id="cicd">
         <h2>CI/CD Pipeline Integration</h2>
         <p>Authenticate your build agents automatically by linking your RepoTrim license key into your integration workflows.</p>
