@@ -435,6 +435,11 @@ jobs:
         <h3>Error: REPOTRIM_LICENSE_KEY environment variable is not set</h3>
         <p>The CLI engine could not locate the key in your terminal context. Ensure you have run the <code class="inline-code">export</code> or <code class="inline-code">set</code> commands in the same terminal window where you are executing the binary.</p>
 
+        <h3>Error: command not found: repotrim (or similar shell errors)</h3>
+        <p>This occurs when the compiled binary is not located in any of the directories defined in your system's <code class="inline-code">$PATH</code> environment variable. You can resolve this by:
+        <br>• Running the binary locally from its directory using <code class="inline-code">./repotrim</code> instead of <code class="inline-code">repotrim</code>.
+        <br>• Placing or compiling the binary directly into a folder in your search path (such as <code class="inline-code">/usr/local/bin</code> or <code class="inline-code">~/.local/bin</code> on macOS/Linux).</p>
+
         <h3>Error: The provided REPOTRIM_LICENSE_KEY is invalid, forbidden, or expired</h3>
         <p>This message occurs if the key is unrecognized in the verification server, has been suspended, or its subscription term has expired. Use the <strong>License Key Status Checker</strong> above to check its status, or contact us at <code class="inline-code">support@repotrim.com</code> if you believe this is in error.</p>
 

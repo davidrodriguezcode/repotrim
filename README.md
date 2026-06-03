@@ -95,11 +95,25 @@ goreleaser release --snapshot --clean
 ```
 
 ### Universal Installer
-The repository includes a POSIX-compliant installer script (`install.sh`) that dynamically reads your local environment architecture and maps target downloads matching GoReleaser conventions:
+The repository includes a POSIX-compliant installer script (`install.sh`) that automatically detects your host OS and CPU architecture, downloads the matching pre-compiled release archive, extracts the executable, and installs it directly into `/usr/local/bin` (or falls back to `~/.local/bin`):
+
 ```bash
+# Run locally
 chmod +x install.sh
 ./install.sh
+
+# Or fetch and execute directly
+curl -sSL https://raw.githubusercontent.com/davidrodriguezcode/repotrim/main/install.sh | sh
 ```
+
+---
+
+## 🛠️ Troubleshooting
+
+### Error: `command not found: repotrim` (or similar shell errors)
+This occurs when the compiled binary is not located in any of the search directories defined in your system's `$PATH` environment variable. To resolve this:
+- Run the binary locally from the folder it exists in using `./repotrim` instead of `repotrim`.
+- Place or compile the binary directly into a directory in your search path (such as `/usr/local/bin` or `~/.local/bin` on macOS/Linux).
 
 ---
 
