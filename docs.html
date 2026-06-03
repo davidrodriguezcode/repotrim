@@ -289,17 +289,34 @@
         <pre class="code-block">
 export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
 ./repotrim -dir .</pre>
-        <p>To persist this variable so you don't need to type it in every new session, append the export line to your profile configuration file (e.g. <code class="inline-code">~/.bashrc</code>, <code class="inline-code">~/.zshrc</code>, or <code class="inline-code">~/.profile</code>).</p>
+        
+        <p>To persist this variable so you don't need to type it in every new session, write it directly to your shell profile configuration:</p>
+        
+        <h4>For Zsh (Default macOS shell):</h4>
+        <pre class="code-block">
+echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.zshrc
+source ~/.zshrc</pre>
+
+        <h4>For Bash (Common Linux shell):</h4>
+        <pre class="code-block">
+echo 'export REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"' >> ~/.bashrc
+source ~/.bashrc</pre>
 
         <h3>Windows (Command Prompt)</h3>
+        <p>Temporary session setup:</p>
         <pre class="code-block">
 set REPOTRIM_LICENSE_KEY=rt_live_your_actual_key
 repotrim.exe -dir .</pre>
 
         <h3>Windows (PowerShell)</h3>
+        <p>Temporary session setup:</p>
         <pre class="code-block">
 $env:REPOTRIM_LICENSE_KEY="rt_live_your_actual_key"
 .\repotrim.exe -dir .</pre>
+
+        <p>To persist this variable permanently on Windows, execute this command in PowerShell:</p>
+        <pre class="code-block">
+[Environment]::SetEnvironmentVariable("REPOTRIM_LICENSE_KEY", "rt_live_your_actual_key", "User")</pre>
       </article>
 
       <!-- Article 3: CI/CD Integration -->
