@@ -30,7 +30,7 @@
       margin: 4rem auto;
       padding: 0 2rem;
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 280px minmax(0, 1fr);
       gap: 3rem;
     }
 
@@ -100,6 +100,7 @@
       display: flex;
       flex-direction: column;
       gap: 4rem;
+      min-width: 0; /* Prevents grid column expansion from wide un-wrapped pre blocks */
     }
 
     .docs-article {
