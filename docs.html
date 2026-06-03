@@ -519,7 +519,7 @@ jobs:
       let current = '';
       articles.forEach(article => {
         const articleTop = article.offsetTop;
-        if (pageYOffset >= (articleTop - 120)) {
+        if ((window.scrollY || window.pageYOffset) >= (articleTop - 120)) {
           current = article.getAttribute('id');
         }
       });
@@ -529,23 +529,52 @@ jobs:
         if (link.getAttribute('href') === '#' + current) {
           link.classList.add('active');
         }
+      });
     });
 
     // Copy to Clipboard Utility
     function copyToClipboard(textId, btnElement) {
       const text = document.getElementById(textId).innerText;
-      navigator.clipboard.writeText(text).then(() => {
+      
+      function updateIcon() {
         const icon = btnElement.querySelector('i');
-        icon.classList.remove('fa-regular', 'fa-copy');
-        icon.classList.add('fa-solid', 'fa-check');
-        icon.style.color = '#10b981';
-        
-        setTimeout(() => {
-          icon.classList.remove('fa-solid', 'fa-check');
-          icon.classList.add('fa-regular', 'fa-copy');
-          icon.style.color = '';
-        }, 2000);
-      });
+        if (icon) {
+          icon.className = 'fa-solid fa-check';
+          icon.style.color = '#10b981';
+          setTimeout(() => {
+            icon.className = 'fa-regular fa-copy';
+            icon.style.color = '';
+          }, 2000);
+        }
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(updateIcon).catch(err => {
+          fallbackCopy(text, updateIcon);
+        });
+      } else {
+        fallbackCopy(text, updateIcon);
+      }
+    }
+
+    function fallbackCopy(text, callback) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          callback();
+        }
+      } catch (err) {
+        console.error('Fallback Copy failed', err);
+      }
+      document.body.removeChild(textArea);
     }
   </script>
 </body>
