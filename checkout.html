@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — RepoTrim</title>
+  <meta name="description" content="Secure Checkout for RepoTrim License Subscription.">
+  <link rel="stylesheet" href="style.css?v=2">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stripe.js SDK -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    .checkout-container {
+      max-width: 800px;
+      margin: 5rem auto;
+      padding: 0 2rem;
+    }
+
+    .checkout-card {
+      padding: 2.5rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-glow);
+      min-height: 420px;
+      position: relative;
+    }
+
+    .checkout-header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .checkout-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 50%, var(--primary-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkout-header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    #checkout-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      gap: 1rem;
+      width: 90%;
+    }
+
+    #checkout-loader i {
+      font-size: 2.5rem;
+      color: var(--primary-accent);
+    }
+
+    #checkout-element {
+      display: none; /* Hidden until loaded */
+    }
+
+    .checkout-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
+    }
+
+    .checkout-back-link:hover {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo-group">
+        <i class="fa-solid fa-scissors"></i> RepoTrim<span>Payment Gateway</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="docs.html">Docs</a></li>
+      </ul>
+      <a href="index.html" class="secondary-button" style="text-decoration: none;">Cancel</a>
+    </div>
+  </header>
+
+  <main class="checkout-container">
+    <a href="index.html" class="checkout-back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to Homepage
+    </a>
+
+    <div class="checkout-card">
+      <div class="checkout-header">
+        <h1>Secure License Checkout</h1>
+        <p>RepoTrim CLI Core Engine — 1 Year Subscription ($10/yr)</p>
+      </div>
+
+      <!-- Loading State Spinner -->
+      <div id="checkout-loader">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Preparing secure checkout session...</span>
+      </div>
+
+      <!-- Stripe Embedded Checkout Element -->
+      <div id="checkout-element"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-copy" style="margin-top: 4rem;">
+      &copy; 2026 RepoTrim Core Engine Project. Securely processed via Stripe.
+    </div>
+  </footer>
+
+  <script>
+    async function initializeCheckout() {
+      const loader = document.getElementById('checkout-loader');
+      const checkoutEl = document.getElementById('checkout-element');
+
+      try {
+        // Fetch client secret and publishable key from the backend
+        const response = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to retrieve checkout configuration from server');
+        }
+
+        const data = await response.json();
+        const clientSecret = data.clientSecret;
+        const publishableKey = data.publishableKey;
+
+        // Initialize Stripe.js
+        const stripe = Stripe(publishableKey);
+
+        // Mount Stripe Embedded Checkout
+        const checkout = await stripe.initEmbeddedCheckout({
+          clientSecret,
+        });
+
+        // Hide loader and display checkout container
+        loader.style.display = 'none';
+        checkoutEl.style.display = 'block';
+
+        checkout.mount('#checkout-element');
+      } catch (error) {
+        console.error('Error mounting Embedded Checkout:', error);
+        loader.innerHTML = `
+          <i class="fa-solid fa-circle-exclamation" style="color: var(--warning); margin-bottom: 0.5rem;"></i>
+          <span style="color: var(--warning); font-weight: 600;">Checkout Session Failed to Load</span>
+          <p style="font-size: 0.9rem; text-align: center; margin-top: 0.5rem; max-width: 400px; line-height: 1.5;">
+            Could not communicate with the payment server. Please verify your network connection or contact support@repotrim.com.
+          </p>
+        `;
+      }
+    }
+
+    initializeCheckout();
+  </script>
+</body>
+</html>
